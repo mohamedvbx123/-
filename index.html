@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقع البوستات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6200ee;
+            --secondary-color: #03dac6;
+            --background-color: #f5f5f5;
+            --card-color: #ffffff;
+            --text-color: #000000;
+            --navbar-height: 50px;
+        }
+
+        .dark-theme {
+            --primary-color: #6200ee;
+            --secondary-color: #03dac6;
+            --background-color: #121212;
+            --card-color: #1e1e1e;
+            --text-color: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            height: var(--navbar-height);
+            background-color: var(--card-color);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text-color);
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .theme-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.3s;
+        }
+
+        .filter-container {
+            padding: 10px 15px;
+            background-color: var(--card-color);
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            cursor: pointer;
+        }
+
+        .filter-dropdown {
+            display: none;
+            margin-top: 10px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            padding-top: 10px;
+        }
+
+        .filter-dropdown.show {
+            display: block;
+        }
+
+        .filter-option {
+            padding: 8px 0;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-option:last-child {
+            border-bottom: none;
+        }
+
+        .filter-option i {
+            color: var(--secondary-color);
+            float: left;
+            margin-top: 3px;
+            display: none;
+        }
+
+        .filter-option.active i {
+            display: inline-block;
+        }
+
+        .main-page {
+            padding: 15px;
+            display: block;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .category-card {
+            background-color: var(--card-color);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+        }
+
+        .category-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(3, 218, 198, 0.2);
+        }
+
+        .category-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: var(--secondary-color);
+        }
+
+        .category-name {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .posts-page {
+            padding: 15px;
+            display: none;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            padding: 5px 0;
+            cursor: pointer;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 16px;
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 15px;
+        }
+
+        .post-card {
+            background-color: var(--card-color);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            position: relative;
+            border: 1px solid rgba(3, 218, 198, 0.2);
+        }
+
+        .post-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(3, 218, 198, 0.3);
+        }
+
+        .post-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .post-image.loading {
+            background-color: #f0f0f0;
+            opacity: 0.5;
+        }
+
+        .post-content {
+            padding: 15px;
+        }
+
+        .post-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 15px;
+            white-space: pre-line;
+            text-align: right;
+        }
+
+        .post-text:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background-color: var(--secondary-color);
+            border-radius: 3px;
+        }
+
+        .post-date {
+            font-size: 12px;
+            color: #888;
+            text-align: left;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .favorites-page {
+            padding: 15px;
+            display: none;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .options-dialog {
+            background-color: var(--card-color);
+            border-radius: 0 0 8px 8px;
+            padding: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+            width: 100%;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(3, 218, 198, 0.3);
+        }
+
+        .options-dialog.show {
+            display: flex;
+        }
+
+        .option-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 5px 8px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .option-btn:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .option-label {
+            font-size: 10px;
+            font-weight: normal;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none;
+        }
+
+        .toast.show {
+            display: block;
+            animation: fadeInOut 2.5s;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        @media (min-width: 768px) {
+            .categories-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+            }
+            
+            .posts-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .nav-title {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="light-theme">
+    <div class="navbar">
+        <div class="nav-actions"></div>
+        <div class="nav-title" id="navTitle">بوستات</div>
+        <div class="nav-actions">
+            <button class="theme-btn" title="تبديل الثيم" id="themeToggleBtn">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="main-page">
+        <div class="categories-grid" id="categoriesGrid"></div>
+    </div>
+
+    <div class="posts-page" id="postsPage">
+        <button class="back-btn" id="backBtn">
+            <i class="fas fa-arrow-left"></i> العودة
+        </button>
+        
+        <div class="filter-container">
+            <div class="filter-header" id="filterHeader">
+                <span>تصفية البوستات</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="filter-dropdown" id="filterDropdown">
+                <div class="filter-option active" data-filter="all">
+                    <span>الكل</span>
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="filter-option" data-filter="latest">
+                    <span>الأحدث</span>
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="filter-option" data-filter="oldest">
+                    <span>الأقدم</span>
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="filter-option" data-filter="text-only">
+                    <span>نصوص فقط</span>
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="filter-option" data-filter="favorites">
+                    <span>المفضلة</span>
+                    <i class="fas fa-check"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="posts-grid" id="postsGrid"></div>
+    </div>
+
+    <div class="favorites-page" id="favoritesPage">
+        <button class="back-btn" id="backBtnFav">
+            <i class="fas fa-arrow-left"></i> العودة
+        </button>
+        <div class="posts-grid" id="favoritesGrid"></div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // بيانات الأقسام مع المسارات الجديدة
+        const categories = [
+            { id: 'romantic', name: 'رومانسية', icon: 'fas fa-heart', jsonPath: 'https://raw.githubusercontent.com/mohamedvbx123/posts_vbx_1/refs/heads/main/posts_data/romantic/posts.json' },
+            { id: 'cartoon', name: 'كرتون', icon: 'fas fa-film', jsonPath: 'https://raw.githubusercontent.com/mohamedvbx123/posts_vbx_1/refs/heads/main/posts_data/cartoon/posts.json' },
+            { id: 'sad', name: 'حزينة', icon: 'fas fa-sad-tear', jsonPath: 'posts_data/sad/posts.json' },
+            { id: 'religious', name: 'دينية', icon: 'fas fa-mosque', jsonPath: 'posts_data/religious/posts.json' },
+            { id: 'quotes', name: 'اقتباسات', icon: 'fas fa-quote-right', jsonPath: 'posts_data/quotes/posts.json' },
+            { id: 'backup1', name: 'احتياطي 1', icon: 'fas fa-archive', jsonPath: 'posts_data/backup1/posts.json' },
+            { id: 'backup2', name: 'احتياطي 2', icon: 'fas fa-archive', jsonPath: 'posts_data/backup2/posts.json' },
+            { id: 'backup3', name: 'احتياطي 3', icon: 'fas fa-archive', jsonPath: 'posts_data/backup3/posts.json' }
+        ];
+
+        // العناصر الرئيسية
+        const categoriesGrid = document.getElementById('categoriesGrid');
+        const postsPage = document.getElementById('postsPage');
+        const postsGrid = document.getElementById('postsGrid');
+        const backBtn = document.getElementById('backBtn');
+        const backBtnFav = document.getElementById('backBtnFav');
+        const favoritesPage = document.getElementById('favoritesPage');
+        const favoritesGrid = document.getElementById('favoritesGrid');
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const toast = document.getElementById('toast');
+        const navTitle = document.getElementById('navTitle');
+        const filterHeader = document.getElementById('filterHeader');
+        const filterDropdown = document.getElementById('filterDropdown');
+
+        // متغيرات حالة التطبيق
+        let currentCategory = '';
+        let currentFilter = 'all';
+        let favorites = JSON.parse(localStorage.getItem('favorites')) || {};
+        let allPosts = [];
+        let filteredPosts = [];
+        let isDarkTheme = localStorage.getItem('isDarkTheme') === 'true';
+
+        // تهيئة الأقسام
+        function initCategories() {
+            categoriesGrid.innerHTML = '';
+            categories.forEach(category => {
+                const categoryCard = document.createElement('div');
+                categoryCard.className = 'category-card';
+                categoryCard.innerHTML = `
+                    <div class="category-icon">
+                        <i class="${category.icon}"></i>
+                    </div>
+                    <div class="category-name">${category.name}</div>
+                `;
+                categoryCard.addEventListener('click', () => showPosts(category.id, category.name));
+                categoriesGrid.appendChild(categoryCard);
+            });
+        }
+
+        // عرض البوستات لقسم معين
+        async function showPosts(categoryId, categoryName) {
+            currentCategory = categoryId;
+            navTitle.textContent = categoryName;
+            postsGrid.innerHTML = '<div class="loading">جاري التحميل...</div>';
+            
+            document.querySelector('.main-page').style.display = 'none';
+            postsPage.style.display = 'block';
+            favoritesPage.style.display = 'none';
+            currentFilter = 'all';
+
+            try {
+                const category = categories.find(c => c.id === categoryId);
+                if (!category) throw new Error('Category not found');
+                
+                const response = await fetch(category.jsonPath);
+                if (!response.ok) throw new Error('Failed to fetch');
+                
+                allPosts = await response.json();
+                filteredPosts = [...allPosts];
+                displayPosts();
+            } catch (error) {
+                console.error('Error fetching posts:', error);
+                postsGrid.innerHTML = '<div class="no-posts">لا توجد بوستات في هذا القسم بعد</div>';
+                showToast('⚠️ حدث خطأ في جلب البيانات');
+            }
+        }
+
+        // عرض البوستات مع تطبيق الفلتر
+        function displayPosts() {
+            postsGrid.innerHTML = '';
+            
+            if (!filteredPosts || filteredPosts.length === 0) {
+                postsGrid.innerHTML = '<div class="no-posts">لا توجد بوستات في هذا القسم بعد</div>';
+                return;
+            }
+            
+            // عرض البوستات بعد التصفية
+            filteredPosts.forEach((post, index) => {
+                const originalIndex = allPosts.findIndex(p => 
+                    p.text === post.text && 
+                    (p.image || '') === (post.image || '') &&
+                    (p.date || '') === (post.date || '')
+                );
+                
+                const postCard = document.createElement('div');
+                postCard.className = 'post-card';
+                
+                let imageHTML = '';
+                if (post.image && post.image.trim() !== '') {
+                    imageHTML = `
+                        <img 
+                            src="placeholder.jpg" 
+                            data-src="${post.image}" 
+                            class="post-image loading" 
+                            alt="صورة البوست" 
+                            loading="lazy"
+                            onload="this.classList.remove('loading')"
+                        >
+                    `;
+                }
+                
+                postCard.innerHTML = `
+                    ${imageHTML}
+                    <div class="post-content">
+                        <p class="post-text">${post.text}</p>
+                        ${post.date ? `<div class="post-date"><i class="far fa-clock"></i> ${post.date}</div>` : ''}
+                    </div>
+                    <div class="options-dialog" id="optionsDialog-${originalIndex}">
+                        <button class="option-btn" onclick="copyText(${originalIndex})">
+                            <i class="fas fa-copy"></i>
+                            <span class="option-label">نسخ</span>
+                        </button>
+                        <button class="option-btn" onclick="sharePost(${originalIndex})">
+                            <i class="fas fa-share-alt"></i>
+                            <span class="option-label">مشاركة</span>
+                        </button>
+                        <button class="option-btn" onclick="toggleFavorite(${originalIndex})" id="favoriteBtn-${originalIndex}">
+                            <i class="fas fa-heart"></i>
+                            <span class="option-label">مفضلة</span>
+                        </button>
+                    </div>
+                `;
+                
+                updateFavoriteButton(originalIndex, post);
+                
+                postCard.addEventListener('click', (e) => {
+                    if (e.target.closest('.option-btn')) return;
+                    
+                    const optionsDialog = postCard.querySelector('.options-dialog');
+                    const isShowing = optionsDialog.classList.contains('show');
+                    
+                    document.querySelectorAll('.options-dialog.show').forEach(dialog => {
+                        if (dialog !== optionsDialog) {
+                            dialog.classList.remove('show');
+                        }
+                    });
+                    
+                    optionsDialog.classList.toggle('show', !isShowing);
+                });
+                
+                const img = postCard.querySelector('img');
+                if (img) {
+                    loadImageWhenVisible(img);
+                }
+                
+                postsGrid.appendChild(postCard);
+            });
+        }
+
+        // تحميل الصور عند الظهور
+        function loadImageWhenVisible(img) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const lazyImage = entry.target;
+                        lazyImage.src = lazyImage.dataset.src;
+                        observer.unobserve(lazyImage);
+                    }
+                });
+            });
+            observer.observe(img);
+        }
+
+        // تحديث حالة زر المفضلة
+        function updateFavoriteButton(index, post) {
+            setTimeout(() => {
+                const favoriteBtn = document.getElementById(`favoriteBtn-${index}`);
+                if (!favoriteBtn) return;
+                
+                const isFavorite = checkIfFavorite(post);
+                favoriteBtn.innerHTML = isFavorite ? 
+                    '<i class="fas fa-heart" style="color: red"></i><span class="option-label">إزالة</span>' : 
+                    '<i class="fas fa-heart"></i><span class="option-label">مفضلة</span>';
+            }, 50);
+        }
+
+        // التحقق من المفضلة
+        function checkIfFavorite(post) {
+            if (!post || !currentCategory) return false;
+            const categoryFavorites = favorites[currentCategory] || [];
+            return categoryFavorites.some(fav => 
+                fav.text === post.text && fav.image === (post.image || '')
+            );
+        }
+
+        // تبديل المفضلة
+        function toggleFavorite(index) {
+            const post = allPosts[index];
+            if (!post || !currentCategory) return;
+            
+            if (!favorites[currentCategory]) {
+                favorites[currentCategory] = [];
+            }
+            
+            const isFavorite = checkIfFavorite(post);
+            
+            if (isFavorite) {
+                favorites[currentCategory] = favorites[currentCategory].filter(fav => 
+                    !(fav.text === post.text && fav.image === (post.image || ''))
+                );
+                showToast('تمت الإزالة من المفضلة');
+            } else {
+                favorites[currentCategory].push({
+                    text: post.text,
+                    image: post.image || '',
+                    date: post.date || '',
+                    copy_text: post.copy_text || post.text
+                });
+                showToast('تمت الإضافة إلى المفضلة');
+            }
+            
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            updateFavoriteButton(index, post);
+            
+            if (currentFilter === 'favorites') {
+                applyFilter();
+            }
+        }
+
+        // عرض المفضلة
+        function showFavorites() {
+            navTitle.textContent = 'المفضلة';
+            favoritesPage.style.display = 'block';
+            document.querySelector('.main-page').style.display = 'none';
+            postsPage.style.display = 'none';
+            
+            favoritesGrid.innerHTML = '';
+            
+            let hasFavorites = false;
+            
+            for (const category in favorites) {
+                if (favorites[category] && favorites[category].length > 0) {
+                    hasFavorites = true;
+                    
+                    const categoryTitle = document.createElement('h2');
+                    categoryTitle.textContent = categories.find(c => c.id === category)?.name || category;
+                    categoryTitle.style.margin = '20px 0 10px';
+                    categoryTitle.style.color = 'var(--secondary-color)';
+                    favoritesGrid.appendChild(categoryTitle);
+                    
+                    favorites[category].forEach((post, index) => {
+                        const postCard = document.createElement('div');
+                        postCard.className = 'post-card';
+                        
+                        let imageHTML = '';
+                        if (post.image && post.image.trim() !== '') {
+                            imageHTML = `
+                                <img 
+                                    src="placeholder.jpg" 
+                                    data-src="${post.image}" 
+                                    class="post-image loading" 
+                                    alt="صورة البوست" 
+                                    loading="lazy"
+                                    onload="this.classList.remove('loading')"
+                                >
+                            `;
+                        }
+                        
+                        postCard.innerHTML = `
+                            ${imageHTML}
+                            <div class="post-content">
+                                <p class="post-text">${post.text}</p>
+                                ${post.date ? `<div class="post-date"><i class="far fa-clock"></i> ${post.date}</div>` : ''}
+                            </div>
+                            <div class="options-dialog" id="optionsDialog-fav-${category}-${index}">
+                                <button class="option-btn" onclick="copyFavText('${category}', ${index})">
+                                    <i class="fas fa-copy"></i>
+                                    <span class="option-label">نسخ</span>
+                                </button>
+                                <button class="option-btn" onclick="shareFavPost('${category}', ${index})">
+                                    <i class="fas fa-share-alt"></i>
+                                    <span class="option-label">مشاركة</span>
+                                </button>
+                                <button class="option-btn" onclick="toggleFavFavorite('${category}', ${index})">
+                                    <i class="fas fa-heart" style="color: red"></i>
+                                    <span class="option-label">إزالة</span>
+                                </button>
+                            </div>
+                        `;
+                        
+                        postCard.addEventListener('click', (e) => {
+                            if (e.target.closest('.option-btn')) return;
+                            
+                            const optionsDialog = postCard.querySelector('.options-dialog');
+                            optionsDialog.classList.toggle('show');
+                        });
+                        
+                        const img = postCard.querySelector('img');
+                        if (img) {
+                            loadImageWhenVisible(img);
+                        }
+                        
+                        favoritesGrid.appendChild(postCard);
+                    });
+                }
+            }
+            
+            if (!hasFavorites) {
+                favoritesGrid.innerHTML = '<div class="no-posts">لا توجد عناصر في المفضلة بعد</div>';
+            }
+        }
+
+        // تطبيق الفلتر المحدد
+        function applyFilter() {
+            filteredPosts = [...allPosts];
+            
+            switch(currentFilter) {
+                case 'latest':
+                    filteredPosts.sort((a, b) => {
+                        const dateA = a.date ? new Date(a.date.split('/').reverse().join('/')) : new Date(0);
+                        const dateB = b.date ? new Date(b.date.split('/').reverse().join('/')) : new Date(0);
+                        return dateB - dateA;
+                    });
+                    break;
+                    
+                case 'oldest':
+                    filteredPosts.sort((a, b) => {
+                        const dateA = a.date ? new Date(a.date.split('/').reverse().join('/')) : new Date(0);
+                        const dateB = b.date ? new Date(b.date.split('/').reverse().join('/')) : new Date(0);
+                        return dateA - dateB;
+                    });
+                    break;
+                    
+                case 'text-only':
+                    filteredPosts = filteredPosts.filter(post => !post.image || post.image.trim() === '');
+                    break;
+                    
+                case 'favorites':
+                    const categoryFavorites = favorites[currentCategory] || [];
+                    filteredPosts = filteredPosts.filter(post => 
+                        categoryFavorites.some(fav => 
+                            fav.text === post.text && fav.image === (post.image || '')
+                        )
+                    );
+                    break;
+            }
+            
+            displayPosts();
+        }
+
+        // تغيير الفلتر
+        function changeFilter(filter) {
+            currentFilter = filter;
+            
+            // تحديث حالة الفلاتر النشطة
+            document.querySelectorAll('.filter-option').forEach(option => {
+                option.classList.remove('active');
+                if (option.dataset.filter === filter) {
+                    option.classList.add('active');
+                }
+            });
+            
+            applyFilter();
+        }
+
+        // نسخ النص
+        function copyText(index) {
+            const post = allPosts[index];
+            const textToCopy = post.copy_text || post.text;
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => showToast('تم نسخ النص بنجاح'))
+                .catch(() => showToast('فشل نسخ النص'));
+        }
+
+        // مشاركة البوست
+        function sharePost(index) {
+            const post = allPosts[index];
+            let shareText = post.copy_text || post.text;
+            
+            if (post.image && post.image.trim() !== '') {
+                shareText += `\n\n${post.image}`;
+            }
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'مشاركة بوست',
+                    text: shareText
+                }).catch(() => {
+                    copyToClipboard(shareText);
+                });
+            } else {
+                copyToClipboard(shareText);
+            }
+        }
+
+        // نسخ النص إلى الحافظة
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast('تم نسخ النص للمشاركة');
+        }
+
+        // تبديل الثيم
+        function toggleTheme() {
+            isDarkTheme = !isDarkTheme;
+            localStorage.setItem('isDarkTheme', isDarkTheme);
+            
+            if (isDarkTheme) {
+                document.body.className = 'dark-theme';
+                themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
+                themeToggleBtn.title = 'الوضع النهاري';
+            } else {
+                document.body.className = 'light-theme';
+                themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
+                themeToggleBtn.title = 'الوضع الليلي';
+            }
+        }
+
+        // عرض رسالة تأكيد
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // العودة للصفحة الرئيسية
+        function backToMain() {
+            navTitle.textContent = 'بوستات';
+            document.querySelector('.main-page').style.display = 'block';
+            postsPage.style.display = 'none';
+            favoritesPage.style.display = 'none';
+            currentCategory = '';
+            currentFilter = 'all';
+        }
+
+        // أحداث DOM
+        backBtn.addEventListener('click', backToMain);
+        backBtnFav.addEventListener('click', backToMain);
+        themeToggleBtn.addEventListener('click', toggleTheme);
+        
+        filterHeader.addEventListener('click', () => {
+            filterDropdown.classList.toggle('show');
+            const icon = filterHeader.querySelector('i');
+            if (filterDropdown.classList.contains('show')) {
+                icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+            } else {
+                icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+            }
+        });
+
+        // تهيئة الفلاتر
+        document.querySelectorAll('.filter-option').forEach(option => {
+            option.addEventListener('click', () => {
+                changeFilter(option.dataset.filter);
+            });
+        });
+
+        // تهيئة التطبيق
+        function initApp() {
+            initCategories();
+            
+            if (isDarkTheme) {
+                document.body.className = 'dark-theme';
+                themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
+                themeToggleBtn.title = 'الوضع النهاري';
+            } else {
+                document.body.className = 'light-theme';
+                themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
+                themeToggleBtn.title = 'الوضع الليلي';
+            }
+        }
+
+        // جعل الدوال متاحة عالمياً
+        window.copyText = copyText;
+        window.sharePost = sharePost;
+        window.toggleFavorite = toggleFavorite;
+        window.copyFavText = function(category, index) {
+            const textToCopy = favorites[category][index].copy_text || favorites[category][index].text;
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => showToast('تم نسخ النص بنجاح'))
+                .catch(() => showToast('فشل نسخ النص'));
+        };
+        window.shareFavPost = function(category, index) {
+            const post = favorites[category][index];
+            let shareText = post.copy_text || post.text;
+            
+            if (post.image && post.image.trim() !== '') {
+                shareText += `\n\n${post.image}`;
+            }
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'مشاركة بوست',
+                    text: shareText
+                }).catch(() => {
+                    copyToClipboard(shareText);
+                });
+            } else {
+                copyToClipboard(shareText);
+            }
+        };
+        window.toggleFavFavorite = function(category, index) {
+            const post = favorites[category][index];
+            favorites[category].splice(index, 1);
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            showFavorites();
+            showToast('تمت الإزالة من المفضلة');
+        };
+
+        // بدء التطبيق
+        initApp();
+    </script>
+</body>
+  </html>
